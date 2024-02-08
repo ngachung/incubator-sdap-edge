@@ -30,6 +30,9 @@ class Writer(SolrTemplateResponseWriter):
         queries = []
         filterQueries = []
         sort = None
+        min_depth = None
+        max_depth = None
+        include_missing_depth = False
 
         for key, value in parameters.items():
             if value != "":
@@ -43,51 +46,42 @@ class Writer(SolrTemplateResponseWriter):
                     coordinates = value.split(",")
                     filterQueries.append('loc:[' + coordinates[1] + ',' + coordinates[0] + '%20TO%20' + coordinates[3] + ',' + coordinates[2] + ']')
                 elif key == 'variable':
-                    if value.lower() == 'sss':
-                        filterQueries.append('sss:[*%20TO%20*]')
-                    elif value.lower() == 'sst':
-                        filterQueries.append('sst:[*%20TO%20*]')
-                    elif value.lower() == 'wind':
-                        filterQueries.append('wind_speed:[*%20TO%20*]')
+                    filterQueries.append('{}:[*%20TO%20*]'.format(value.lower()))
                 elif key == "minDepth":
-                    if 'variable' in parameters:
-                        if parameters['variable'].lower() == 'sss':
-                            filterQueries.append('(sss_depth:['+value+'%20TO%20*]+OR+(*:*%20NOT%20sss_depth:*))')
-                        elif parameters['variable'].lower() == 'sst':
-                            filterQueries.append('(sst_depth:['+value+'%20TO%20*]+OR+(*:*%20NOT%20sst_depth:*))')
-                        elif parameters['variable'].lower() == 'wind':
-                            filterQueries.append('(wind_depth:['+value+'%20TO%20*]+OR+(*:*%20NOT%20wind_depth:*))')
+                    min_depth = value
                 elif key == "maxDepth":
-                    if 'variable' in parameters:
-                        if parameters['variable'].lower() == 'sss':
-                            filterQueries.append('(sss_depth:[*%20TO%20'+value+']+OR+(*:*%20NOT%20sss_depth:*))')
-                        elif parameters['variable'].lower() == 'sst':
-                            filterQueries.append('(sst_depth:[*%20TO%20'+value+']+OR+(*:*%20NOT%20sst_depth:*))')
-                        elif parameters['variable'].lower() == 'wind':
-                            filterQueries.append('(wind_depth:[*%20TO%20'+value+']+OR+(*:*%20NOT%20wind_depth:*))')
+                    max_depth = value
                 # include data only at specified quality level and have default at good in UI
                 elif key == "qualityFlag":
                     if 'variable' in parameters:
-                        if parameters['variable'].lower() == 'sss':
-                            if type(value) is list:
-                                filterQueries.append('(sss_qc_flag:(' + '+OR+'.join(value) + '))')
-                            else:
-                                filterQueries.append('(sss_qc_flag:('+value+'))')
-                        elif parameters['variable'].lower() == 'sst':
-                            if type(value) is list:
-                                filterQueries.append('(sst_qc_flag:(' + '+OR+'.join(value) + '))')
-                            else:
-                                filterQueries.append('(sst_qc_flag:('+value+'))')
-                        elif parameters['variable'].lower() == 'wind':
-                            if type(value) is list:
-                                filterQueries.append('(wind_qc_flag:(' + '+OR+'.join(value) + '))')
-                            else:
-                                filterQueries.append('(wind_qc_flag:(' + value + '))')
+                        variable = parameters['variable'].lower()
+                        if type(value) is list:
+                            filterQueries.append('({}_quality:('.format(variable) + '+OR+'.join(value) + '))')
+                        else:
+                            filterQueries.append('({}_quality:('.format(variable) + str(value) + '))')
                 elif key == 'platform':
                     if type(value) is list:
                         filterQueries.append('platform:(' + '+OR+'.join(value) + ')')
                     else:
                         filterQueries.append('platform:'+value)
+
+        if min_depth is not None and max_depth is not None and min_depth <= 0 <= max_depth:
+            include_missing_depth = True
+        elif min_depth is not None and min_depth <= 0:
+            include_missing_depth = True
+        elif max_depth is not None and 0 <= max_depth:
+            include_missing_depth = True
+
+        if min_depth is not None:
+            if include_missing_depth:
+                filterQueries.append('(depth:['+min_depth+'%20TO%20*]+OR+(depth:\-99999.0))')
+            else:
+                filterQueries.append('(depth:['+min_depth+'%20TO%20*])')
+        if max_depth is not None:
+            if include_missing_depth:
+                filterQueries.append('(depth:[*%20TO%20' + max_depth + ']+OR+(depth:\-99999.0))')
+            else:
+                filterQueries.append('(depth:[*%20TO%20' + max_depth + '])')
 
         if len(queries) == 0:
             queries.append('*:*')

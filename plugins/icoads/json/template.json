@@ -6,34 +6,48 @@
 "results":[
 {% for doc in docs %}
 {
-"id": "{{ doc['id'] }}",
 "time": "{{ doc['time'] }}",
-"point": "{{ doc['loc'] }}",
-"sea_water_temperature": {{ doc['sst'] | jsonify }},
-"sea_water_temperature_depth": {{ doc['sst_depth'] | jsonify }},
-"sea_water_temperature_quality": {{ doc['sst_qc_flag'] | jsonify }},
+"latitude": {{ doc['latitude'] | jsonify }},
+"longitude": {{ doc['longitude'] | jsonify }},
+"depth": {{ doc['depth'] | jsonify }},
+"sea_water_temperature": {{ doc['sea_water_temperature'] | jsonify }},
+"sea_water_temperature_quality": {{ doc['sea_water_temperature_quality'] | jsonify }},
+"sea_water_salinity": {{ doc['sea_water_salinity'] | jsonify }},
+"sea_water_salinity_quality": {{ doc['sea_water_salinity_quality'] | jsonify }},
 "wind_speed": {{ doc['wind_speed'] | jsonify }},
-"eastward_wind": {{ doc['wind_u'] | jsonify }},
-"northward_wind": {{ doc['wind_v'] | jsonify }},
-"wind_depth": {{ doc['wind_depth'] | jsonify }},
-"wind_speed_quality": {{ doc['wind_qc_flag'] | jsonify }},
-"wind_component_quality": {{ doc['wind_qc_flag'] | jsonify }},
-"sea_water_salinity": {{ doc['sss'] | jsonify }},
-"sea_water_salinity_depth": {{ doc['sss_depth'] | jsonify }},
-"sea_water_salinity_quality": {{ doc['sss_qc_flag'] | jsonify }},
-"mission": {{ doc['mission'] | jsonify }},
-"platform": {{ doc['platform'] | jsonify }},
+"wind_speed_quality": {{ doc['wind_speed_quality'] | jsonify }},
+"wind_from_direction": {{ doc['wind_from_direction'] | jsonify }},
+"wind_from_direction_quality": {{ doc['wind_from_direction_quality'] | jsonify }},
+"eastward_wind": {{ doc['eastward_wind'] | jsonify }},
+"northward_wind": {{ doc['northward_wind'] | jsonify }},
+"wind_component_quality": {{ doc['wind_component_quality'] | jsonify }},
+"air_temperature": {{ doc['air_temperature'] | jsonify }},
+"air_temperature_quality": {{ doc['air_temperature_quality'] | jsonify }},
+"air_pressure": {{ doc['air_pressure'] | jsonify }},
+"air_pressure_quality": {{ doc['air_pressure_quality'] | jsonify }},
+"relative_humidity": {{ doc['relative_humidity'] | jsonify }},
+"relative_humidity_quality": {{ doc['relative_humidity_quality'] | jsonify }},
+"dew_point_temperature": {{ doc['dew_point_temperature'] | jsonify }},
+"dew_point_temperature_quality": {{ doc['dew_point_temperature_quality'] | jsonify }},
+"wet_bulb_temperature": {{ doc['wet_bulb_temperature'] | jsonify }},
+"wet_bulb_temperature_quality": {{ doc['wet_bulb_temperature_quality'] | jsonify }},
+"platform": {
+"code": {{ doc['pcode'] | jsonify }},
+"type": {{ doc['ptype'] | jsonify }},
+"id": {{ doc['pid'] | jsonify }}
+},
 "device": {{ doc['device'] | jsonify }},
-"metadata": {{ doc['meta'] }}
+"meta": "https://rda.ucar.edu/php/icoadsuid.php?uid={{ doc['meta'] }}",
+"provider": "Florida State University, COAPS",
+"project": "SAMOS",
+"platform_code": {{ doc['pcode'] | jsonify }}
 }
 {% if not loop.last %}
 ,
 {% endif %}
 {% endfor %}
 ]
-,"totalResults":{{ numFound }}
-,"startIndex":{{ startIndex  }}
-,"itemsPerPage":{{ itemsPerPage }}
+,"total":{{ numFound }}
 {% if stats %}
 ,
 "stats_fields": {{ stats['stats_fields'] | jsonify }}
