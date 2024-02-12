@@ -65,23 +65,23 @@ class Writer(SolrTemplateResponseWriter):
                     else:
                         filterQueries.append('platform:'+value)
 
-        if min_depth is not None and max_depth is not None and min_depth <= 0 <= max_depth:
+        if min_depth is not None and max_depth is not None and float(min_depth) <= 0 <= float(max_depth):
             include_missing_depth = True
-        elif min_depth is not None and min_depth <= 0:
+        elif min_depth is not None and float(min_depth) <= 0:
             include_missing_depth = True
-        elif max_depth is not None and 0 <= max_depth:
+        elif max_depth is not None and 0 <= float(max_depth):
             include_missing_depth = True
 
         if min_depth is not None:
             if include_missing_depth:
-                filterQueries.append('(depth:['+min_depth+'%20TO%20*]+OR+(depth:\-99999.0))')
+                filterQueries.append('(depth:['+min_depth+'%20TO%20*]+OR+depth:[-99999.9%20TO%20-99998.1])')
             else:
-                filterQueries.append('(depth:['+min_depth+'%20TO%20*])')
+                filterQueries.append('(depth:['+min_depth+'%20TO%20*]+AND+-depth:[-99999.9%20TO%20-99998.1])')
         if max_depth is not None:
             if include_missing_depth:
-                filterQueries.append('(depth:[*%20TO%20' + max_depth + ']+OR+(depth:\-99999.0))')
+                filterQueries.append('(depth:[*%20TO%20' + max_depth + ']+OR+depth:[-99999.9%20TO%20-99998.1])')
             else:
-                filterQueries.append('(depth:[*%20TO%20' + max_depth + '])')
+                filterQueries.append('(depth:[*%20TO%20' + max_depth + ']+AND+-depth:[-99999.9%20TO%20-99998.1])')
 
         if len(queries) == 0:
             queries.append('*:*')
