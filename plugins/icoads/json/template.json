@@ -37,9 +37,9 @@
 "id": {{ doc['pid'] | jsonify }}
 },
 "device": {{ doc['device'] | jsonify }},
-"meta": "https://rda.ucar.edu/php/icoadsuid.php?uid={{ doc['meta'] }}",
-"provider": "Florida State University, COAPS",
-"project": "SAMOS",
+"meta": "https://rda.ucar.edu/php/icoadsuid.php?uid={{ doc['uid'] }}",
+"provider": "NCAR",
+"project": "ICOADS Release 3.0",
 "platform_code": {{ doc['pcode'] | jsonify }}
 }
 {% if not loop.last %}
