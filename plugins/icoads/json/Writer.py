@@ -61,9 +61,9 @@ class Writer(SolrTemplateResponseWriter):
                             filterQueries.append('({}_quality:('.format(variable) + str(value) + '))')
                 elif key == 'platform':
                     if type(value) is list:
-                        filterQueries.append('platform:(' + '+OR+'.join(value) + ')')
+                        filterQueries.append('pcode:(' + '+OR+'.join(value) + ')')
                     else:
-                        filterQueries.append('platform:'+value)
+                        filterQueries.append('pcode:'+value)
 
         if min_depth is not None and max_depth is not None and float(min_depth) <= 0 <= float(max_depth):
             include_missing_depth = True
@@ -98,7 +98,7 @@ class Writer(SolrTemplateResponseWriter):
             query += '&stats=true&stats.field={!min=true%20max=true}sss_depth&stats.field={!min=true%20max=true}sst_depth&stats.field={!min=true%20max=true}wind_depth'
 
         if 'facet' in parameters and parameters['facet'].lower() == 'true':
-            query += '&facet=true&facet.field=platform&facet.field=device&facet.limit=-1&facet.mincount=1'
+            query += '&facet=true&facet.field=pcode&facet.field=device&facet.limit=-1&facet.mincount=1'
 
         logging.debug('solr query: '+query)
 
